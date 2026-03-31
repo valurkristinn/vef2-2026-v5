@@ -22,6 +22,38 @@ export type SanityImageAssetReference = {
   [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
+export type Hero = {
+  _id: string;
+  _type: "hero";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type BirdReference = {
   _ref: string;
   _type: "reference";
@@ -82,22 +114,6 @@ export type Bird = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type Slug = {
@@ -205,11 +221,12 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | SanityImageAssetReference
+  | Hero
+  | SanityImageCrop
+  | SanityImageHotspot
   | BirdReference
   | Post
   | Bird
-  | SanityImageCrop
-  | SanityImageHotspot
   | Slug
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -244,7 +261,17 @@ export type POSTS_QUERY_RESULT = Array<{
 // Source: ../vef2-2026-v5/app/page.tsx
 // Variable: HERO_QUERY
 // Query: *[  _type == "hero"]|order(publishedAt desc)[0]{  _id,   title,   image,}
-export type HERO_QUERY_RESULT = null;
+export type HERO_QUERY_RESULT = {
+  _id: string;
+  title: string | null;
+  image: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+} | null;
 
 // Query TypeMap
 import "@sanity/client";

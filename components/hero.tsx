@@ -1,5 +1,5 @@
 import Image from "next/image";
-import "@/styles/_hero.scss";
+import "@/styles/_hero.sass";
 
 export default function Hero({
   title,

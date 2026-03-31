@@ -40,9 +40,7 @@ export default async function IndexPage() {
 
   return (
     <main>
-      {hero && (
-        <Hero title={hero.title} image={urlFor(hero.image).url()} />
-      )}
+      {hero && <Hero title={hero.title!} image={urlFor(hero.image!).url()} />}
       <h1>Posts</h1>
       <ul>
         {posts.map((post) => (
