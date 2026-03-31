@@ -5,29 +5,20 @@ import { PortableText } from "@portabletext/react";
 
 import { client } from "@/src/sanity/client";
 import { urlFor } from "@/src/sanity/image";
-import { POST_BY_SLUG_QUERY, POST_SLUGS_QUERY } from "@/src/sanity/queries";
+import { POST_BY_SLUG_QUERY } from "@/src/sanity/queries";
 
-import '@/styles/post.sass'
-
-interface PostPageProps {
+export default async function Page({
+  params,
+}: {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  const slugs = await client.fetch(POST_SLUGS_QUERY);
-  return slugs.map((post: { slug: string }) => ({
-    slug: post.slug,
-  }));
-}
-
-export default async function Page({ params }: PostPageProps) {
+}) {
   const { slug } = await params;
   const post = await client.fetch(POST_BY_SLUG_QUERY, { slug });
 
   if (!post) notFound();
 
   return (
-    <main>
+    <main className="post">
       <article>
         <h1>{post.title}</h1>
 
@@ -35,7 +26,7 @@ export default async function Page({ params }: PostPageProps) {
           {post.image && (
             <Image
               src={urlFor(post.image).width(800).url()}
-              alt={post.title}
+              alt={post.title!}
               fill
               priority
             />
@@ -47,14 +38,24 @@ export default async function Page({ params }: PostPageProps) {
           {post.author?.name && (
             <span>
               {" • "}
-              <Link href={`/${post.author.slug}`}>{post.author.name}</Link>
+              {post.author.image && (
+                <Image
+                  src={urlFor(post.author.image).url()}
+                  alt={post.author.name}
+                  width={32}
+                  height={32}
+                />
+              )}
+              <Link href={`/birds/${post.author.slug.current}`}>{post.author.name}</Link>
             </span>
           )}
         </div>
 
-        <div>
-          <PortableText value={post.body} />
-        </div>
+        {post.body && (
+          <div>
+            <PortableText value={post.body} />
+          </div>
+        )}
 
         <footer>
           <Link href="/">← Til baka</Link>

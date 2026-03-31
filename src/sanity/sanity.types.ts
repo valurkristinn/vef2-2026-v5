@@ -114,6 +114,7 @@ export type Bird = {
     crop?: SanityImageCrop;
     _type: "image";
   };
+  description?: string;
 };
 
 export type Slug = {
@@ -239,22 +240,15 @@ export type AllSanitySchemaTypes =
 
 // Source: ../vef2-2026-v5/src/sanity/queries.ts
 // Variable: POSTS_QUERY
-// Query: *[_type == "post" && defined(slug.current)]|order(publishedAt desc)[0...12]{  _id,   title,   slug,  image,  publishedAt,   author->{name, "slug": slug.current}}
+// Query: *[_type == "post" && defined(slug.current)]|order(publishedAt desc)[0...12]{  _id,   title,   slug,  publishedAt,   author->{name, slug}}
 export type POSTS_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
-  image: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  } | null;
   publishedAt: string | null;
   author: {
     name: string | null;
-    slug: string | null;
+    slug: Slug | null;
   } | null;
 }>;
 
@@ -275,9 +269,10 @@ export type HERO_QUERY_RESULT = {
 
 // Source: ../vef2-2026-v5/src/sanity/queries.ts
 // Variable: POST_BY_SLUG_QUERY
-// Query: *[_type == "post" && slug.current == $slug][0]{  publishedAt,  image,  body,  author->{name, "slug": slug.current}}
+// Query: *[_type == "post" && slug.current == $slug][0]{  publishedAt,  title,  image,  body,  author->{name, slug, image}}
 export type POST_BY_SLUG_QUERY_RESULT = {
   publishedAt: string | null;
+  title: string | null;
   image: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -305,24 +300,46 @@ export type POST_BY_SLUG_QUERY_RESULT = {
   }> | null;
   author: {
     name: string | null;
-    slug: string | null;
+    slug: Slug | null;
+    image: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
   } | null;
 } | null;
 
 // Source: ../vef2-2026-v5/src/sanity/queries.ts
-// Variable: POST_SLUGS_QUERY
-// Query: *[_type == "post" && defined(slug.current)]{  "slug": slug.current}
-export type POST_SLUGS_QUERY_RESULT = Array<{
-  slug: string | null;
-}>;
+// Variable: BIRD_BY_SLUG_QUERY
+// Query: *[_type == "bird" && slug.current == $slug][0]{  name,  species,  image,  description,  "posts": *[_type == "post" && references(^._id)] | order(publishedAt desc) {    _id,    title,    slug,    publishedAt  }}
+export type BIRD_BY_SLUG_QUERY_RESULT = {
+  name: string | null;
+  species: string | null;
+  image: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  description: string | null;
+  posts: Array<{
+    _id: string;
+    title: string | null;
+    slug: Slug | null;
+    publishedAt: string | null;
+  }>;
+} | null;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type == "post" && defined(slug.current)]|order(publishedAt desc)[0...12]{\n  _id, \n  title, \n  slug,\n  image,\n  publishedAt, \n  author->{name, "slug": slug.current}\n}': POSTS_QUERY_RESULT;
+    '*[_type == "post" && defined(slug.current)]|order(publishedAt desc)[0...12]{\n  _id, \n  title, \n  slug,\n  publishedAt, \n  author->{name, slug}\n}': POSTS_QUERY_RESULT;
     '*[_type == "hero"]|order(_createdAt desc)[0]{\n  _id, \n  title, \n  image\n}': HERO_QUERY_RESULT;
-    '*[_type == "post" && slug.current == $slug][0]{\n  publishedAt,\n  image,\n  body,\n  author->{name, "slug": slug.current}\n}': POST_BY_SLUG_QUERY_RESULT;
-    '*[_type == "post" && defined(slug.current)]{\n  "slug": slug.current\n}': POST_SLUGS_QUERY_RESULT;
+    '*[_type == "post" && slug.current == $slug][0]{\n  publishedAt,\n  title,\n  image,\n  body,\n  author->{name, slug, image}\n}': POST_BY_SLUG_QUERY_RESULT;
+    '*[_type == "bird" && slug.current == $slug][0]{\n  name,\n  species,\n  image,\n  description,\n  "posts": *[_type == "post" && references(^._id)] | order(publishedAt desc) {\n    _id,\n    title,\n    slug,\n    publishedAt\n  }\n}': BIRD_BY_SLUG_QUERY_RESULT;
   }
 }

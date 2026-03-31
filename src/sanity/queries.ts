@@ -6,7 +6,7 @@ export const POSTS_QUERY =
   title, 
   slug,
   publishedAt, 
-  author->{name, "slug": slug.current}
+  author->{name, slug}
 }`);
 
 export const HERO_QUERY =
@@ -19,12 +19,24 @@ export const HERO_QUERY =
 export const POST_BY_SLUG_QUERY =
   defineQuery(`*[_type == "post" && slug.current == $slug][0]{
   publishedAt,
+  title,
   image,
   body,
-  author->{name, "slug": slug.current}
+  author->{name, slug, image}
 }`);
 
-export const POST_SLUGS_QUERY =
-  defineQuery(`*[_type == "post" && defined(slug.current)]{
-  "slug": slug.current
+export const BIRD_BY_SLUG_QUERY =
+  defineQuery(`*[_type == "bird" && slug.current == $slug][0]{
+  name,
+  species,
+  image,
+  description,
+  "posts": *[_type == "post" && references(^._id)] | order(publishedAt desc) {
+    _id,
+    title,
+    slug,
+    publishedAt
+  }
 }`);
+
+

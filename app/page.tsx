@@ -6,8 +6,6 @@ import { POSTS_QUERY, HERO_QUERY } from "@/src/sanity/queries";
 
 import Hero from "@/components/hero";
 
-import "@/styles/index.sass";
-
 const options = { next: { revalidate: 30 } };
 
 export default async function Page() {
@@ -15,7 +13,7 @@ export default async function Page() {
   const hero = await client.fetch(HERO_QUERY, {}, options);
 
   return (
-    <main>
+    <main className="index">
       {hero && (
         <Hero
           title={hero.title!}
@@ -37,7 +35,7 @@ export default async function Page() {
 
             {post.author?.slug && (
               <p>
-                <Link href={`/${post.author.slug}`}>{post.author.name}</Link>
+                <Link href={`/birds/${post.author.slug.current}`}>{post.author.name}</Link>
               </p>
             )}
             </article>
