@@ -30,7 +30,7 @@ export default async function Page({
           )}
           <div>
             <h1>{bird.name}</h1>
-            <h3>{bird.species}</h3>
+            <h4>{bird.species}</h4>
           </div>
         </div>
 
