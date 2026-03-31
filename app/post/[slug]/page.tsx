@@ -34,19 +34,19 @@ export default async function Page({
         </div>
 
         <div>
-          <time>{new Date(post.publishedAt).toLocaleDateString()}</time>
+          <time>{new Date(post.publishedAt!).toLocaleDateString()}</time>
           {post.author?.name && (
             <span>
               {" • "}
               {post.author.image && (
                 <Image
-                  src={urlFor(post.author.image).url()}
+                  src={urlFor(post.author.image).width(128).height(128).url()}
                   alt={post.author.name}
                   width={32}
                   height={32}
                 />
               )}
-              <Link href={`/birds/${post.author.slug.current}`}>{post.author.name}</Link>
+              { post.author.slug && <Link href={`/birds/${post.author.slug.current}`}>{post.author.name}</Link> }
             </span>
           )}
         </div>
