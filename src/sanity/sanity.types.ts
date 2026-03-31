@@ -237,9 +237,9 @@ export type AllSanitySchemaTypes =
   | SanityImageAsset
   | Geopoint;
 
-// Source: ../vef2-2026-v5/app/page.tsx
+// Source: ../vef2-2026-v5/src/sanity/queries.ts
 // Variable: POSTS_QUERY
-// Query: *[  _type == "post"  && defined(slug.current)]|order(publishedAt desc)[0...12]{  _id,   title,   slug,  image,  publishedAt,   author->{name, slug}}
+// Query: *[_type == "post" && defined(slug.current)]|order(publishedAt desc)[0...12]{  _id,   title,   slug,  image,  publishedAt,   author->{name, "slug": slug.current}}
 export type POSTS_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -254,13 +254,13 @@ export type POSTS_QUERY_RESULT = Array<{
   publishedAt: string | null;
   author: {
     name: string | null;
-    slug: Slug | null;
+    slug: string | null;
   } | null;
 }>;
 
-// Source: ../vef2-2026-v5/app/page.tsx
+// Source: ../vef2-2026-v5/src/sanity/queries.ts
 // Variable: HERO_QUERY
-// Query: *[  _type == "hero"]|order(publishedAt desc)[0]{  _id,   title,   image,}
+// Query: *[_type == "hero"]|order(_createdAt desc)[0]{  _id,   title,   image}
 export type HERO_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -273,11 +273,56 @@ export type HERO_QUERY_RESULT = {
   } | null;
 } | null;
 
+// Source: ../vef2-2026-v5/src/sanity/queries.ts
+// Variable: POST_BY_SLUG_QUERY
+// Query: *[_type == "post" && slug.current == $slug][0]{  publishedAt,  image,  body,  author->{name, "slug": slug.current}}
+export type POST_BY_SLUG_QUERY_RESULT = {
+  publishedAt: string | null;
+  image: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
+  body: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }> | null;
+  author: {
+    name: string | null;
+    slug: string | null;
+  } | null;
+} | null;
+
+// Source: ../vef2-2026-v5/src/sanity/queries.ts
+// Variable: POST_SLUGS_QUERY
+// Query: *[_type == "post" && defined(slug.current)]{  "slug": slug.current}
+export type POST_SLUGS_QUERY_RESULT = Array<{
+  slug: string | null;
+}>;
+
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[\n  _type == "post"\n  && defined(slug.current)\n]|order(publishedAt desc)[0...12]{\n  _id, \n  title, \n  slug,\n  image,\n  publishedAt, \n  author->{name, slug}\n}': POSTS_QUERY_RESULT;
-    '*[\n  _type == "hero"\n]|order(publishedAt desc)[0]{\n  _id, \n  title, \n  image,\n}': HERO_QUERY_RESULT;
+    '*[_type == "post" && defined(slug.current)]|order(publishedAt desc)[0...12]{\n  _id, \n  title, \n  slug,\n  image,\n  publishedAt, \n  author->{name, "slug": slug.current}\n}': POSTS_QUERY_RESULT;
+    '*[_type == "hero"]|order(_createdAt desc)[0]{\n  _id, \n  title, \n  image\n}': HERO_QUERY_RESULT;
+    '*[_type == "post" && slug.current == $slug][0]{\n  publishedAt,\n  image,\n  body,\n  author->{name, "slug": slug.current}\n}': POST_BY_SLUG_QUERY_RESULT;
+    '*[_type == "post" && defined(slug.current)]{\n  "slug": slug.current\n}': POST_SLUGS_QUERY_RESULT;
   }
 }
